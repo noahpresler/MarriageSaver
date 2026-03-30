@@ -1,10 +1,10 @@
 import pool from '../db/connection.js';
 
-export async function create({ householdId, title, description, createdBy, assignedTo, priority, dueDate }) {
+export async function create({ householdId, title, description, createdBy, assignedTo, priority, dueDate, recurrenceInterval, recurrenceLabel }) {
   const { rows } = await pool.query(
-    `INSERT INTO tasks (household_id, title, description, created_by, assigned_to, priority, due_date)
-     VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-    [householdId, title, description || null, createdBy, assignedTo || null, priority || 'normal', dueDate || null]
+    `INSERT INTO tasks (household_id, title, description, created_by, assigned_to, priority, due_date, recurrence_interval, recurrence_label)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+    [householdId, title, description || null, createdBy, assignedTo || null, priority || 'normal', dueDate || null, recurrenceInterval || null, recurrenceLabel || null]
   );
   return findById(rows[0].id);
 }
@@ -58,19 +58,64 @@ export async function complete(taskId, userId) {
      WHERE id = $2`,
     [userId, taskId]
   );
-  return findById(taskId);
+
+  const completedTask = await findById(taskId);
+
+  // If this task is recurring, spawn the next instance
+  if (completedTask && completedTask.recurrence_interval) {
+    const nextDueDate = new Date();
+    nextDueDate.setDate(nextDueDate.getDate() + completedTask.recurrence_interval);
+    const dueDateStr = nextDueDate.toISOString().split('T')[0];
+
+    await create({
+      householdId: completedTask.household_id,
+      title: completedTask.title,
+      description: completedTask.description,
+      createdBy: completedTask.created_by,
+      assignedTo: completedTask.assigned_to,
+      priority: completedTask.priority,
+      dueDate: dueDateStr,
+      recurrenceInterval: completedTask.recurrence_interval,
+      recurrenceLabel: completedTask.recurrence_label,
+    });
+  }
+
+  return completedTask;
 }
 
 export async function skip(taskId) {
   await pool.query(`UPDATE tasks SET status = 'skipped' WHERE id = $1`, [taskId]);
-  return findById(taskId);
+
+  const skippedTask = await findById(taskId);
+
+  // If recurring, still spawn the next instance
+  if (skippedTask && skippedTask.recurrence_interval) {
+    const nextDueDate = new Date();
+    nextDueDate.setDate(nextDueDate.getDate() + skippedTask.recurrence_interval);
+    const dueDateStr = nextDueDate.toISOString().split('T')[0];
+
+    await create({
+      householdId: skippedTask.household_id,
+      title: skippedTask.title,
+      description: skippedTask.description,
+      createdBy: skippedTask.created_by,
+      assignedTo: skippedTask.assigned_to,
+      priority: skippedTask.priority,
+      dueDate: dueDateStr,
+      recurrenceInterval: skippedTask.recurrence_interval,
+      recurrenceLabel: skippedTask.recurrence_label,
+    });
+  }
+
+  return skippedTask;
 }
 
-export async function update(taskId, { title, description, assignedTo, priority, dueDate }) {
+export async function update(taskId, { title, description, assignedTo, priority, dueDate, recurrenceInterval, recurrenceLabel }) {
   await pool.query(
-    `UPDATE tasks SET title = $1, description = $2, assigned_to = $3, priority = $4, due_date = $5
-     WHERE id = $6`,
-    [title, description || null, assignedTo || null, priority || 'normal', dueDate || null, taskId]
+    `UPDATE tasks SET title = $1, description = $2, assigned_to = $3, priority = $4, due_date = $5,
+     recurrence_interval = $6, recurrence_label = $7
+     WHERE id = $8`,
+    [title, description || null, assignedTo || null, priority || 'normal', dueDate || null, recurrenceInterval || null, recurrenceLabel || null, taskId]
   );
   return findById(taskId);
 }

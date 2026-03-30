@@ -25,7 +25,17 @@ router.get('/household/tasks', requireAuth, requireHousehold, async (req, res) =
 
 // Create task
 router.post('/tasks', requireAuth, requireHousehold, async (req, res) => {
-  const { title, description, assignedTo, priority, dueDate } = req.body;
+  const { title, description, assignedTo, priority, dueDate, recurrence } = req.body;
+
+  // Map recurrence selection to interval in days and label
+  const recurrenceMap = {
+    daily: { days: 1, label: 'Daily' },
+    '3days': { days: 3, label: 'Every 3 days' },
+    weekly: { days: 7, label: 'Weekly' },
+    biweekly: { days: 14, label: 'Every 2 weeks' },
+    monthly: { days: 30, label: 'Monthly' },
+  };
+  const rec = recurrenceMap[recurrence] || null;
 
   const task = await Task.create({
     householdId: req.session.householdId,
@@ -35,6 +45,8 @@ router.post('/tasks', requireAuth, requireHousehold, async (req, res) => {
     assignedTo: assignedTo || null,
     priority,
     dueDate: dueDate || null,
+    recurrenceInterval: rec?.days,
+    recurrenceLabel: rec?.label,
   });
 
   if (req.headers['hx-request']) {

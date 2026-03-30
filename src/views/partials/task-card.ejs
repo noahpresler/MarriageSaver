@@ -4,6 +4,9 @@
 
   <div class="task-card-header">
     <span class="task-priority priority-<%= task.priority %>"><%= task.priority %></span>
+    <% if (task.recurrence_label) { %>
+      <span class="task-recurrence-badge"><%= task.recurrence_label %></span>
+    <% } %>
     <% if (task.due_date) { %>
       <span class="task-due"><%= task.due_date %></span>
     <% } %>

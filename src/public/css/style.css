@@ -539,6 +539,17 @@ a:hover {
   color: var(--text-muted);
 }
 
+.task-recurrence-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(76, 175, 80, 0.15);
+  color: #2e7d32;
+  padding: 0.15rem 0.5rem;
+  border-radius: 10px;
+}
+
 .task-title {
   font-size: 1.05rem;
   margin-bottom: 0.25rem;
