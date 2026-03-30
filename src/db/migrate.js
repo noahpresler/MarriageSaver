@@ -1,22 +1,22 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import db from './connection.js';
+import pool from './connection.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const migrationsDir = path.join(__dirname, 'migrations');
 
 export async function runMigrations() {
-  await db.execute(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS migrations (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       name TEXT UNIQUE NOT NULL,
-      applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      applied_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
 
-  const result = await db.execute('SELECT name FROM migrations');
-  const applied = new Set(result.rows.map((r) => r.name));
+  const { rows } = await pool.query('SELECT name FROM migrations');
+  const applied = new Set(rows.map((r) => r.name));
 
   const files = fs
     .readdirSync(migrationsDir)
@@ -27,16 +27,8 @@ export async function runMigrations() {
     if (applied.has(file)) continue;
 
     const sql = fs.readFileSync(path.join(migrationsDir, file), 'utf-8');
-    // Split on semicolons and execute each statement
-    const statements = sql
-      .split(';')
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-
-    for (const stmt of statements) {
-      await db.execute(stmt);
-    }
-    await db.execute({ sql: 'INSERT INTO migrations (name) VALUES (?)', args: [file] });
+    await pool.query(sql);
+    await pool.query('INSERT INTO migrations (name) VALUES ($1)', [file]);
     console.log(`Migration applied: ${file}`);
   }
 }
