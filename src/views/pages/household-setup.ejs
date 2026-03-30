@@ -1,0 +1,32 @@
+<div class="auth-page">
+  <div class="auth-card sticky-note sticky-blue">
+    <h2>Set Up Your Household</h2>
+
+    <% if (error) { %>
+      <div class="error-message"><%= error %></div>
+    <% } %>
+
+    <div x-data="{ mode: 'create' }" class="household-setup">
+      <div class="tab-toggle">
+        <button @click="mode = 'create'" :class="mode === 'create' ? 'active' : ''" class="tab-btn">Create New</button>
+        <button @click="mode = 'join'" :class="mode === 'join' ? 'active' : ''" class="tab-btn">Join Existing</button>
+      </div>
+
+      <form x-show="mode === 'create'" action="/household/create" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="name">Household Name</label>
+          <input type="text" id="name" name="name" placeholder="The Smiths" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Household</button>
+      </form>
+
+      <form x-show="mode === 'join'" action="/household/join" method="POST" class="auth-form">
+        <div class="form-group">
+          <label for="inviteCode">Invite Code</label>
+          <input type="text" id="inviteCode" name="inviteCode" placeholder="abc123ef" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Join Household</button>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+<div class="ideas-page">
+  <div class="tasks-header">
+    <h1>Idea Generator</h1>
+    <p class="subtitle">Need something to do? Here are some suggestions for your household.</p>
+  </div>
+
+  <div id="idea-list">
+    <%- include('../partials/idea-list', { suggestions, members }) %>
+  </div>
+
+  <div class="ideas-actions">
+    <button hx-post="/ideas/generate"
+            hx-target="#idea-list"
+            hx-swap="innerHTML"
+            class="btn btn-secondary btn-lg">
+      Give Me More Ideas
+    </button>
+  </div>
+</div>

@@ -1,0 +1,138 @@
+/* ============================
+   Entrance Animations
+   ============================ */
+.fade-in {
+  animation: fadeInUp 0.5s ease both;
+}
+
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================
+   Task Card Animations
+   ============================ */
+.task-card {
+  animation: slideIn 0.3s ease both;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Completed task peel-off */
+.task-completed {
+  animation: peelOff 0.6s ease both;
+}
+
+@keyframes peelOff {
+  0% {
+    transform: perspective(600px) rotateY(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: perspective(600px) rotateY(-15deg) translateX(20px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: perspective(600px) rotateY(0deg);
+    opacity: 0.7;
+  }
+}
+
+/* ============================
+   Sticky Note Wobble
+   ============================ */
+.sticky-note {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* ============================
+   Button Press Effect
+   ============================ */
+.btn:active {
+  transform: translateY(1px) scale(0.98);
+}
+
+.btn-success:active {
+  animation: successPulse 0.3s ease;
+}
+
+@keyframes successPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+/* ============================
+   Confetti Particle
+   ============================ */
+.confetti-particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  animation: confettiFall var(--fall-duration, 2s) ease-in forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) rotate(var(--rotation, 720deg));
+  }
+}
+
+/* ============================
+   Adopted Idea
+   ============================ */
+.adopted-message {
+  animation: popIn 0.4s ease both;
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ============================
+   HTMX Loading Indicator
+   ============================ */
+.htmx-request {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.htmx-settling {
+  opacity: 1;
+}

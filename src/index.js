@@ -1,12 +1,12 @@
-const http = require('http');
+import 'dotenv/config';
+import app from './app.js';
+import { runMigrations } from './db/migrate.js';
 
 const PORT = process.env.PORT || 3000;
 
-const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify({ message: 'MarriageSaver API' }));
-});
+// Run database migrations on startup
+runMigrations();
 
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`MarriageSaver running on http://localhost:${PORT}`);
 });

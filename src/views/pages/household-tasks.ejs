@@ -1,0 +1,50 @@
+<div class="tasks-page">
+  <div class="tasks-header">
+    <h1>Household Tasks</h1>
+  </div>
+
+  <!-- Group tasks by member -->
+  <% const grouped = {};
+     const unassigned = [];
+     tasks.forEach(t => {
+       if (t.assigned_to) {
+         if (!grouped[t.assigned_to]) grouped[t.assigned_to] = { name: t.assigned_name, color: t.assigned_color, tasks: [] };
+         grouped[t.assigned_to].tasks.push(t);
+       } else {
+         unassigned.push(t);
+       }
+     });
+  %>
+
+  <% if (unassigned.length > 0) { %>
+    <section class="member-section">
+      <h2 class="member-heading">Unassigned</h2>
+      <div class="task-list">
+        <% unassigned.forEach(task => { %>
+          <%- include('../partials/task-card', { task, members, user }) %>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <% Object.values(grouped).forEach(group => { %>
+    <section class="member-section">
+      <h2 class="member-heading">
+        <span class="avatar avatar-sm" style="background-color: <%= group.color %>"><%= group.name.charAt(0).toUpperCase() %></span>
+        <%= group.name %>
+        <span class="task-count"><%= group.tasks.length %></span>
+      </h2>
+      <div class="task-list">
+        <% group.tasks.forEach(task => { %>
+          <%- include('../partials/task-card', { task, members, user }) %>
+        <% }) %>
+      </div>
+    </section>
+  <% }) %>
+
+  <% if (tasks.length === 0) { %>
+    <div class="empty-state">
+      <p>No tasks in your household yet. Time to add some!</p>
+    </div>
+  <% } %>
+</div>

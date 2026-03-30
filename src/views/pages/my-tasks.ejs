@@ -1,0 +1,62 @@
+<div class="tasks-page">
+  <div class="tasks-header">
+    <h1>My Tasks</h1>
+    <div class="tasks-stats">
+      <span class="stat-badge"><%= completedCount %> completed</span>
+    </div>
+  </div>
+
+  <!-- New Task Form -->
+  <div x-data="{ open: false }" class="new-task-wrapper">
+    <button @click="open = !open" class="btn btn-primary add-task-btn">
+      <span x-text="open ? '&minus;' : '+'"></span> Add Task
+    </button>
+
+    <form x-show="open" x-transition
+          hx-post="/tasks"
+          hx-target="#task-list"
+          hx-swap="afterbegin"
+          hx-on::after-request="this.reset()"
+          class="new-task-form sticky-note sticky-green">
+      <div class="form-group">
+        <input type="text" name="title" placeholder="What needs doing?" required class="task-input">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <select name="assignedTo">
+            <option value="">Assign to...</option>
+            <% members.forEach(m => { %>
+              <option value="<%= m.id %>" <%= m.id === user.id ? 'selected' : '' %>><%= m.display_name %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <select name="priority">
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <input type="date" name="dueDate">
+        </div>
+      </div>
+      <div class="form-group">
+        <textarea name="description" placeholder="Any details? (optional)" rows="2"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Add Task</button>
+    </form>
+  </div>
+
+  <!-- Task List -->
+  <div id="task-list" class="task-list">
+    <% if (tasks.length === 0) { %>
+      <div class="empty-state">
+        <p>No tasks yet! Add one above or check out the <a href="/ideas">Idea Generator</a>.</p>
+      </div>
+    <% } %>
+    <% tasks.forEach(task => { %>
+      <%- include('../partials/task-card', { task, members, user }) %>
+    <% }) %>
+  </div>
+</div>

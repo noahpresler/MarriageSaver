@@ -1,0 +1,31 @@
+<div class="auth-page">
+  <div class="auth-card sticky-note sticky-pink">
+    <h2>Create Your Account</h2>
+
+    <% if (error) { %>
+      <div class="error-message"><%= error %></div>
+    <% } %>
+
+    <form action="/register" method="POST" class="auth-form">
+      <div class="form-group">
+        <label for="displayName">Your Name</label>
+        <input type="text" id="displayName" name="displayName" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required minlength="6">
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" name="confirmPassword" required minlength="6">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
+    </form>
+
+    <p class="auth-switch">Already have an account? <a href="/login">Log in</a></p>
+  </div>
+</div>

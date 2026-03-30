@@ -1,0 +1,71 @@
+<div class="task-card sticky-note <%= task.status === 'completed' ? 'task-completed' : '' %>"
+     id="task-<%= task.id %>"
+     style="<%= task.assigned_color ? 'border-left: 4px solid ' + task.assigned_color : '' %>">
+
+  <div class="task-card-header">
+    <span class="task-priority priority-<%= task.priority %>"><%= task.priority %></span>
+    <% if (task.due_date) { %>
+      <span class="task-due"><%= task.due_date %></span>
+    <% } %>
+  </div>
+
+  <h3 class="task-title"><%= task.title %></h3>
+
+  <% if (task.description) { %>
+    <p class="task-description"><%= task.description %></p>
+  <% } %>
+
+  <div class="task-meta">
+    <% if (task.assigned_name) { %>
+      <span class="avatar avatar-xs" style="background-color: <%= task.assigned_color %>"><%= task.assigned_name.charAt(0).toUpperCase() %></span>
+      <span class="task-assignee"><%= task.assigned_name %></span>
+    <% } %>
+  </div>
+
+  <% if (task.status === 'pending') { %>
+    <div class="task-actions">
+      <button hx-post="/tasks/<%= task.id %>/complete"
+              hx-target="#task-<%= task.id %>"
+              hx-swap="outerHTML"
+              class="btn btn-success btn-sm">
+        Done!
+      </button>
+      <button hx-post="/tasks/<%= task.id %>/skip"
+              hx-target="#task-<%= task.id %>"
+              hx-swap="outerHTML"
+              class="btn btn-ghost btn-sm">
+        Skip
+      </button>
+      <button hx-post="/tasks/<%= task.id %>/delete"
+              hx-target="#task-<%= task.id %>"
+              hx-swap="outerHTML"
+              hx-confirm="Delete this task?"
+              class="btn btn-ghost btn-sm btn-danger">
+        Delete
+      </button>
+    </div>
+  <% } else if (task.status === 'completed') { %>
+    <div class="task-completed-badge">Completed</div>
+  <% } %>
+
+  <!-- Feedback -->
+  <div class="task-feedback"
+       hx-get="/tasks/<%= task.id %>/feedback"
+       hx-trigger="load"
+       hx-swap="innerHTML">
+  </div>
+
+  <% if (task.status !== 'completed') { %>
+    <div class="feedback-actions" x-data="{ showComment: false }">
+      <div class="emoji-reactions">
+        <% ['👍', '❤️', '🔥', '💪'].forEach(emoji => { %>
+          <button hx-post="/tasks/<%= task.id %>/feedback"
+                  hx-vals='{"emoji": "<%= emoji %>"}'
+                  hx-target="#task-<%= task.id %> .task-feedback"
+                  hx-swap="innerHTML"
+                  class="emoji-btn"><%= emoji %></button>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+</div>

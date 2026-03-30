@@ -1,0 +1,15 @@
+<% if (feedback && feedback.length > 0) { %>
+  <div class="feedback-list">
+    <% feedback.forEach(fb => { %>
+      <% if (fb.emoji) { %>
+        <span class="feedback-emoji" title="<%= fb.display_name %>"><%= fb.emoji %></span>
+      <% } %>
+      <% if (fb.comment) { %>
+        <div class="feedback-comment">
+          <span class="avatar avatar-xs" style="background-color: <%= fb.avatar_color %>"><%= fb.display_name.charAt(0).toUpperCase() %></span>
+          <span><%= fb.comment %></span>
+        </div>
+      <% } %>
+    <% }) %>
+  </div>
+<% } %>

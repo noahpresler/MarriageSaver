@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title + ' — MarriageSaver' : 'MarriageSaver' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.14.8/dist/cdn.min.js"></script>
+</head>
+<body hx-boost="true">
+  <% if (isAuthenticated) { %>
+  <nav class="main-nav">
+    <a href="/" class="nav-logo">MarriageSaver</a>
+    <div class="nav-links">
+      <a href="/tasks" class="nav-link">My Tasks</a>
+      <a href="/household/tasks" class="nav-link">Household</a>
+      <a href="/ideas" class="nav-link">Ideas</a>
+      <a href="/household" class="nav-link">Settings</a>
+    </div>
+    <div class="nav-user">
+      <span class="avatar" style="background-color: <%= user.avatarColor %>"><%= user.displayName.charAt(0).toUpperCase() %></span>
+      <form action="/logout" method="POST" style="display:inline">
+        <button type="submit" class="btn-link">Log out</button>
+      </form>
+    </div>
+  </nav>
+  <% } %>
+
+  <main class="container">
+    <%- body %>
+  </main>
+
+  <div id="celebration" class="celebration-overlay" style="display:none"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

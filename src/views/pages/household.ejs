@@ -1,0 +1,29 @@
+<div class="settings-page">
+  <h1><%= household.name %></h1>
+
+  <section class="settings-section sticky-note sticky-yellow">
+    <h2>Members</h2>
+    <div class="member-list">
+      <% members.forEach(m => { %>
+        <div class="member-item">
+          <span class="avatar" style="background-color: <%= m.avatar_color %>"><%= m.display_name.charAt(0).toUpperCase() %></span>
+          <span><%= m.display_name %></span>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <section class="settings-section sticky-note sticky-blue">
+    <h2>Invite Others</h2>
+    <p>Share this code with your household members:</p>
+    <div class="invite-code" x-data="{ copied: false }">
+      <code class="code-display"><%= household.invite_code %></code>
+      <button @click="navigator.clipboard.writeText('<%= household.invite_code %>'); copied = true; setTimeout(() => copied = false, 2000)"
+              class="btn btn-secondary btn-sm"
+              x-text="copied ? 'Copied!' : 'Copy'">
+        Copy
+      </button>
+    </div>
+    <p class="text-muted">Or share this link: <code><%= `${process.env.BASE_URL || 'http://localhost:3000'}/join/${household.invite_code}` %></code></p>
+  </section>
+</div>
