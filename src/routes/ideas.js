@@ -28,27 +28,27 @@ const IDEA_POOL = [
   { title: 'Rotate seasonal clothes', category: 'organizing', description: 'Store off-season clothes, bring out what you need' },
 ];
 
-router.get('/ideas', requireAuth, requireHousehold, (req, res) => {
+router.get('/ideas', requireAuth, requireHousehold, async (req, res) => {
   const suggestions = getRandomIdeas(3);
-  const members = User.getHouseholdMembers(req.session.householdId);
+  const members = await User.getHouseholdMembers(req.session.householdId);
 
   res.render('pages/ideas', { suggestions, members });
 });
 
-router.post('/ideas/generate', requireAuth, requireHousehold, (req, res) => {
+router.post('/ideas/generate', requireAuth, requireHousehold, async (req, res) => {
   const suggestions = getRandomIdeas(3);
-  const members = User.getHouseholdMembers(req.session.householdId);
+  const members = await User.getHouseholdMembers(req.session.householdId);
 
   if (req.headers['hx-request']) {
-    return res.render('partials/idea-list', { suggestions, members });
+    return res.render('partials/idea-list', { suggestions, members, layout: false });
   }
   res.render('pages/ideas', { suggestions, members });
 });
 
-router.post('/ideas/adopt', requireAuth, requireHousehold, (req, res) => {
+router.post('/ideas/adopt', requireAuth, requireHousehold, async (req, res) => {
   const { title, description, assignedTo } = req.body;
 
-  Task.create({
+  await Task.create({
     householdId: req.session.householdId,
     title,
     description,

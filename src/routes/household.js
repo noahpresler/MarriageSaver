@@ -10,44 +10,44 @@ router.get('/household/setup', requireAuth, (req, res) => {
   res.render('pages/household-setup', { error: null });
 });
 
-router.post('/household/create', requireAuth, (req, res) => {
+router.post('/household/create', requireAuth, async (req, res) => {
   const { name } = req.body;
   if (!name || !name.trim()) {
     return res.render('pages/household-setup', { error: 'Household name is required' });
   }
 
-  const household = Household.createHousehold(name.trim());
-  User.joinHousehold(req.session.userId, household.id);
-  req.session.householdId = household.id;
+  const household = await Household.createHousehold(name.trim());
+  await User.joinHousehold(req.session.userId, Number(household.id));
+  req.session.householdId = Number(household.id);
 
   res.redirect('/tasks');
 });
 
-router.post('/household/join', requireAuth, (req, res) => {
+router.post('/household/join', requireAuth, async (req, res) => {
   const { inviteCode } = req.body;
-  const household = Household.findByInviteCode(inviteCode?.trim());
+  const household = await Household.findByInviteCode(inviteCode?.trim());
 
   if (!household) {
     return res.render('pages/household-setup', { error: 'Invalid invite code' });
   }
 
-  User.joinHousehold(req.session.userId, household.id);
-  req.session.householdId = household.id;
+  await User.joinHousehold(req.session.userId, Number(household.id));
+  req.session.householdId = Number(household.id);
 
   res.redirect('/tasks');
 });
 
-router.get('/household', requireAuth, (req, res) => {
+router.get('/household', requireAuth, async (req, res) => {
   if (!req.session.householdId) return res.redirect('/household/setup');
 
-  const household = Household.findById(req.session.householdId);
-  const members = User.getHouseholdMembers(req.session.householdId);
+  const household = await Household.findById(req.session.householdId);
+  const members = await User.getHouseholdMembers(req.session.householdId);
 
   res.render('pages/household', { household, members });
 });
 
-router.get('/join/:inviteCode', (req, res) => {
-  const household = Household.findByInviteCode(req.params.inviteCode);
+router.get('/join/:inviteCode', async (req, res) => {
+  const household = await Household.findByInviteCode(req.params.inviteCode);
   if (!household) {
     return res.redirect('/?error=invalid-invite');
   }
@@ -57,8 +57,8 @@ router.get('/join/:inviteCode', (req, res) => {
     return res.redirect('/register');
   }
 
-  User.joinHousehold(req.session.userId, household.id);
-  req.session.householdId = household.id;
+  await User.joinHousehold(req.session.userId, Number(household.id));
+  req.session.householdId = Number(household.id);
   res.redirect('/tasks');
 });
 

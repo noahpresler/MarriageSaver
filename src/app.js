@@ -1,6 +1,5 @@
 import express from 'express';
-import session from 'express-session';
-import connectSqlite3 from 'connect-sqlite3';
+import cookieSession from 'cookie-session';
 import expressLayouts from 'express-ejs-layouts';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -11,7 +10,6 @@ import taskRoutes from './routes/tasks.js';
 import ideaRoutes from './routes/ideas.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SQLiteStore = connectSqlite3(session);
 
 const app = express();
 
@@ -26,21 +24,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Sessions
+// Sessions (cookie-based, no server-side store needed)
 app.use(
-  session({
-    store: new SQLiteStore({
-      db: 'sessions.db',
-      dir: path.join(__dirname, '../data'),
-    }),
-    secret: process.env.SESSION_SECRET || 'change-me-in-production',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-      httpOnly: true,
-      sameSite: 'lax',
-    },
+  cookieSession({
+    name: 'session',
+    keys: [process.env.SESSION_SECRET || 'change-me-in-production'],
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+    httpOnly: true,
+    sameSite: 'lax',
   })
 );
 

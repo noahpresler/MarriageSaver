@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import * as User from '../models/user.js';
-import * as Household from '../models/household.js';
 
 const router = Router();
 
@@ -9,18 +8,18 @@ router.get('/login', (req, res) => {
   res.render('pages/login', { error: null });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  const user = User.authenticate(email, password);
+  const user = await User.authenticate(email, password);
 
   if (!user) {
     return res.render('pages/login', { error: 'Invalid email or password' });
   }
 
-  req.session.userId = user.id;
+  req.session.userId = Number(user.id);
   req.session.displayName = user.display_name;
   req.session.avatarColor = user.avatar_color;
-  req.session.householdId = user.household_id;
+  req.session.householdId = user.household_id ? Number(user.household_id) : null;
 
   if (!user.household_id) {
     return res.redirect('/household/setup');
@@ -33,7 +32,7 @@ router.get('/register', (req, res) => {
   res.render('pages/register', { error: null });
 });
 
-router.post('/register', (req, res) => {
+router.post('/register', async (req, res) => {
   const { email, displayName, password, confirmPassword } = req.body;
 
   if (password !== confirmPassword) {
@@ -44,14 +43,14 @@ router.post('/register', (req, res) => {
     return res.render('pages/register', { error: 'Password must be at least 6 characters' });
   }
 
-  const existing = User.findByEmail(email);
+  const existing = await User.findByEmail(email);
   if (existing) {
     return res.render('pages/register', { error: 'An account with this email already exists' });
   }
 
-  const user = User.createUser({ email, displayName, password });
+  const user = await User.createUser({ email, displayName, password });
 
-  req.session.userId = user.id;
+  req.session.userId = Number(user.id);
   req.session.displayName = user.display_name;
   req.session.avatarColor = user.avatar_color;
 
@@ -59,9 +58,8 @@ router.post('/register', (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/');
-  });
+  req.session = null;
+  res.redirect('/');
 });
 
 export default router;

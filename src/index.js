@@ -5,7 +5,7 @@ import { runMigrations } from './db/migrate.js';
 const PORT = process.env.PORT || 3000;
 
 // Run database migrations on startup
-runMigrations();
+await runMigrations();
 
 app.listen(PORT, () => {
   console.log(`MarriageSaver running on http://localhost:${PORT}`);
